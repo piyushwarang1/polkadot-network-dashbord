@@ -1,14 +1,21 @@
+import React from 'react';
 import './App.css';
 import { usePolkadotApi } from './hooks/usePolkadotApi';
-import NetworkStats from './components/NetworkStats';
+import Navigation from './components/Navigation';
+import HeroStats from './components/HeroStats';
+import RecentBlocks from './components/RecentBlocks';
+import RecentExtrinsics from './components/RecentExtrinsics';
+import NetworkStatus from './components/NetworkStatus';
+import ChainInformation from './components/ChainInformation';
+import QuickStats from './components/QuickStats';
 
 function App() {
-  const { api, isConnected, isLoading, error } = usePolkadotApi();
+  const { api, isConnected, isLoading, error, chainInfo } = usePolkadotApi();
 
   if (isLoading) {
     return (
-      <div style={styles.loading}>
-        <div style={styles.spinner}></div>
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
         <h2>🔗 Connecting to Polkadot Network...</h2>
         <p>This may take a few seconds</p>
       </div>
@@ -17,10 +24,11 @@ function App() {
 
   if (error) {
     return (
-      <div style={styles.error}>
-        <h2>❌ Connection Error</h2>
+      <div className="error-screen">
+        <div className="error-icon">❌</div>
+        <h2>Connection Error</h2>
         <p>{error}</p>
-        <button onClick={() => window.location.reload()} style={styles.button}>
+        <button onClick={() => window.location.reload()} className="retry-button">
           Try Again
         </button>
       </div>
@@ -29,7 +37,7 @@ function App() {
 
   if (!isConnected) {
     return (
-      <div style={styles.loading}>
+      <div className="loading-screen">
         <h2>⏳ Connecting...</h2>
       </div>
     );
@@ -37,52 +45,66 @@ function App() {
 
   return (
     <div className="App">
-      <NetworkStats api={api} />
+      <Navigation chainInfo={chainInfo} />
+      
+      <div className="page-background">
+        <div className="container">
+          {/* Hero Stats Section */}
+          <section className="hero-section">
+            <HeroStats api={api} />
+          </section>
+
+          {/* Main Content Grid */}
+          <div className="main-grid">
+            {/* Left Column */}
+            <div className="main-content">
+              <RecentBlocks api={api} />
+              <RecentExtrinsics api={api} />
+            </div>
+
+            {/* Right Sidebar */}
+            <aside className="sidebar">
+              <NetworkStatus />
+              <ChainInformation chainInfo={chainInfo} />
+              <QuickStats api={api} />
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-section">
+              <h4>BeaconBlock</h4>
+              <p>Universal Substrate Blockchain Explorer</p>
+            </div>
+            <div className="footer-section">
+              <h4>Resources</h4>
+              <a href="#docs">Documentation</a>
+              <a href="#api">API</a>
+              <a href="#support">Support</a>
+            </div>
+            <div className="footer-section">
+              <h4>Community</h4>
+              <a href="#github">GitHub</a>
+              <a href="#discord">Discord</a>
+              <a href="#twitter">Twitter</a>
+            </div>
+            <div className="footer-section">
+              <h4>Legal</h4>
+              <a href="#privacy">Privacy Policy</a>
+              <a href="#terms">Terms of Service</a>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>&copy; 2025 BeaconBlock. Built for the Substrate Ecosystem.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
-
-const styles = {
-  loading: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: 'white',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  },
-  spinner: {
-    width: '50px',
-    height: '50px',
-    border: '5px solid rgba(255, 255, 255, 0.3)',
-    borderTop: '5px solid white',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-    marginBottom: '20px',
-  },
-  error: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: 'white',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  },
-  button: {
-    marginTop: '20px',
-    padding: '12px 30px',
-    fontSize: '16px',
-    background: 'white',
-    color: '#667eea',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  },
-};
 
 export default App;
